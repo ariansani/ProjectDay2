@@ -1,26 +1,45 @@
 package sg.edu.nus.iss.workshop11;
 
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @SpringBootApplication
 public class Workshop11Application {
+	private static final Logger logger = LoggerFactory.getLogger(Workshop11Application.class);
+	private static final String DEFAULT_PORT_NUMBER = "3000";
 
 	public static void main(String[] args) {
-		SpringApplication.run(Workshop11Application.class, args);
-	}
+		logger.info("Workshop 11 logger");
+		logger.debug("Workshop 11 debug");
+		String portNumber = null;
+		SpringApplication app = new SpringApplication(Workshop11Application.class);
+		DefaultApplicationArguments appArgs = new DefaultApplicationArguments(args);
 
-	// public static void main(String[] args) {
-	// SpringApplication app = new SpringApplication(Workshop11Application.class);
-	// String port = "8080";
-	// ApplicationArguments cliOpts = new DefaultApplicationArguments(args);
-	// if cliOpts.containsOption(“port”)
-	// port = cliOpts.getOptionValues(“port”).get(0); // get the first value
-	// app.setDefaultProperties(
-	// Collections.singletonMap(“server.port”, port)
-	// );
-	// System.out.printf(“Application started on port %d\n”, port);
-	// app.run(args);
-	// }
+		List optVals = appArgs.getOptionValues("port");
+		logger.info("optVals > " + optVals);
+
+		if (optVals == null || optVals.get(0) == null) {
+			
+			portNumber = System.getenv("PORT");
+			if (portNumber == null) {
+				portNumber = DEFAULT_PORT_NUMBER;
+			}
+		} else {
+			portNumber = (String) optVals.get(0);
+		}
+
+		if (portNumber != null) {
+			app.setDefaultProperties(Collections.singletonMap("server.port", portNumber));
+		}
+		app.run(args);
+
+	}
 
 }
